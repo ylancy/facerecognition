@@ -1,10 +1,11 @@
 import React from 'react';
 import { signOutUser } from '../../utili/firebase';
 
-const Navigation = ({ onRouteChange, signedIn }) => {
+const Navigation = ({ onRouteChange, signedIn, resetState }) => {
 
     const signOutHandler = () => {
         onRouteChange('signin');
+        resetState();
         signOutUser();
     }
 

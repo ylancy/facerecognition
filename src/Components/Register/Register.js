@@ -28,7 +28,7 @@ class Register extends React.Component {
         try {
             const { user } = await createAuthUserWithEmailAndPassword(this.state.registerEmail, this.state.registerPassword);
             await createUserDocFromAuth(user, { name: this.state.registerName, entries: 0 });
-            this.props.onRouteChange('home');
+            this.props.onRouteChange('signin');
         } catch (error) {
             if (error.code === 'auth/email-already-in-use') {
                 alert('email already registered')

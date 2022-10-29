@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import './App.css';
 import { onAuthStateChangedListener, getUserAndDoc, updateUser } from "./utili/firebase";
-import { loadFull } from "tsparticles";
 import Navigation from './Components/Navigation/Navigation';
 import Logo from './Components/Logo/Logo';
 import Rank from './Components/Rank/Rank';
@@ -10,35 +9,36 @@ import FaceRecognition from './Components/FaceRecognition/FaceRecognition';
 import Signin from './Components/Signin/Signin';
 import Register from './Components/Register/Register';
 
-const readFirebase = async () => {
-
-}
-
+const emptyState = {
+  imageUrl: '',
+  boxes: [],
+  route: 'signin',
+  signedIn: false,
+  user: {
+    uid: '',
+    name: '',
+    email: '',
+    entries: '',
+    joined: ''
+  }
+};
 class App extends Component {
+
   constructor() {
     super();
-    this.state = {
-      imageUrl: '',
-      boxes: [],
-      route: 'signin',
-      signedIn: false,
-      user: {
-        uid: '',
-        name: '',
-        email: '',
-        entries: '',
-        joined: ''
-      }
-    }
-    this.unsubscribe = null;
+    this.state = emptyState;
+  }
+
+  resetState = () => {
+    this.setState(emptyState);
   }
 
   readFirebase = async (currentUid) => {
     const userMap = await getUserAndDoc();
-    const currentUser = userMap.find(user => user.uid === currentUid)
+    const currentUser = userMap.find(user => user.uid === currentUid);
     this.setState({
       user: {
-        uid: currentUser.uid,
+        uid: currentUid,
         name: currentUser.name,
         email: currentUser.email,
         entries: currentUser.entries,
@@ -48,7 +48,7 @@ class App extends Component {
   }
 
   componentDidMount() {
-    this.unsubscribe = onAuthStateChangedListener(async (user) => {
+    onAuthStateChangedListener(async (user) => {
       if (user) {
         const currentUid = user.uid;
         this.readFirebase(currentUid);
@@ -66,10 +66,6 @@ class App extends Component {
         });
       }
     });
-  }
-
-  componentWillUnmount() {
-    this.unsubscribe();
   }
 
   calculateFaceLocation = (data) => {
@@ -107,7 +103,6 @@ class App extends Component {
       this.setState({ signedIn: false })
     }
     this.setState({ route: route });
-
   }
 
   onButtonSubmit = () => {
@@ -150,7 +145,7 @@ class App extends Component {
   render() {
     return (
       <div className="App">
-        <Navigation onRouteChange={this.onRouteChange} signedIn={this.state.signedIn} />
+        <Navigation onRouteChange={this.onRouteChange} signedIn={this.state.signedIn} resetState={this.resetState} />
         {this.state.route === 'signin'
           ? < Signin onRouteChange={this.onRouteChange} loadUser={this.loadUser} />
           : (this.state.route === 'home')
